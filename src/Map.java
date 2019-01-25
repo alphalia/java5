@@ -44,7 +44,11 @@ public class Map {
       }
     }
   }
-
+  /**
+   * 移動経路を検索
+   * @param hero 主人公
+   * @param enemy 移動する敵
+   */
   public void search(Hero hero, Enemy enemy) {
     // 最小距離を初期化
     for (int i = 0; i < h; i++) {

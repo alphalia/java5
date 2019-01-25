@@ -1,6 +1,8 @@
 import java.awt.*;
 
-public class Enemy extends Character {
+public class Enemy extends Character implements Runnable {
+  // Thread th = null;
+  // Hero hero = null;
   // notice; Default(Future)
   // hp: 30(1000), mp: 20(100), ATK: 25(300), DEF: 15(100)
   // if hp is 0, Enemy dies.
@@ -10,6 +12,10 @@ public class Enemy extends Character {
   @Override
   public int attack(Character ch) {
     return super.attack(ch);
+  }
+  @Override
+  public void run() {
+    // search();
   }
   @Override
   public void move(Dir dir, MainFrame fr, Map map) {
@@ -53,3 +59,4 @@ public class Enemy extends Character {
     return result;
   }
 }
+

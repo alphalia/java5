@@ -21,14 +21,14 @@ public class TitlePanel extends JPanel implements Runnable, KeyListener {
     setOpaque(false);
     try {
       // 画像の読み込み
-      tile = ImageIO.read(new File("img/skyroop.png"));
-      fr.tiles[0] = ImageIO.read(new File("img/chara_hero.png"));
-      fr.tiles[1] = ImageIO.read(new File("img/object_stairs.png"));
-      fr.tiles[2] = ImageIO.read(new File("img/chara_slime.png"));
-      fr.tiles[3] = ImageIO.read(new File("img/item1.png"));
-      fr.tiles[4] = ImageIO.read(new File("img/weapon1.png"));
-      fr.world = ImageIO.read(new File("img/map1.png"));
-      fr.duel = ImageIO.read(new File("img/map2.png"));
+      tile = ImageIO.read(new File("../img/skyroop.png"));
+      fr.tiles[0] = ImageIO.read(new File("../img/chara_hero.png"));
+      fr.tiles[1] = ImageIO.read(new File("../img/object_stairs.png"));
+      fr.tiles[2] = ImageIO.read(new File("../img/chara_slime.png"));
+      fr.tiles[3] = ImageIO.read(new File("../img/item1.png"));
+      fr.tiles[4] = ImageIO.read(new File("../img/weapon1.png"));
+      fr.world = ImageIO.read(new File("../img/map1.png"));
+      fr.duel = ImageIO.read(new File("../img/map2.png"));
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -97,7 +97,7 @@ public class TitlePanel extends JPanel implements Runnable, KeyListener {
     g.setFont(font2);
     g.drawString("Press any key", 260, 330);
     g.setColor(new Color(0, 0, 0));
-    g.drawString("素材・背景: 白螺子屋(http://hi79.web.fc2.com/)", 200, 430);
+    g.drawString("素材・背景: 白螺子屋(http://hi79.web.fc2.com/)", 180, 430);
   }
   @Override
   public void keyPressed(KeyEvent e) {

@@ -8,18 +8,17 @@ import javax.imageio.*;
 import java.io.*;
 
 public class FieldPanel extends JPanel implements KeyListener, Runnable {
-  private int val = 0, motion = 1;
-  private int turnType = 0, circ = 0, thrCh = 0;
+  private int motion = 1, turnType = 0, circ = 0, thrCh = 0;
   private Map map;
   protected MainFrame fr;
   public Hero hero;
   private ArrayList<Enemy> enemies;
   private ArrayList<Integer> enemiesID;
   private int index = 0, id = 0;
-  long time1, time2;
-  private boolean fade = false, command = false, thr = false;
+  private boolean command = false, thr = false;
   Random rnd = new Random();
   Thread th = null;
+  BufferedImage bufferedImage;
   public FieldPanel(MainFrame fr, Hero hero, ArrayList<Enemy> enemies, ArrayList<Integer> enemiesID, Map map, int[] menuCmd) {
     this.hero = hero; this.enemies = enemies; this.enemiesID = enemiesID; this.map = map; this.fr = fr;
     addKeyListener(this);
@@ -43,6 +42,8 @@ public class FieldPanel extends JPanel implements KeyListener, Runnable {
   
   @Override
   public void paintComponent(Graphics g) {
+    bufferedImage = new BufferedImage(MainFrame.WIDTH, MainFrame.HEIGHT, BufferedImage.TYPE_INT_RGB);
+    Graphics bg = bufferedImage.createGraphics();
     try {
       g.setColor(Color.black);
       // マップスクロール
@@ -51,20 +52,20 @@ public class FieldPanel extends JPanel implements KeyListener, Runnable {
       // 画面の先端座標(ローカル)
       map.frameEdge = map.getLocal(new Point(0, 0));
 
-      if (fr.floor < 5) g.drawImage(fr.world, (map.edge.x + 7) * MainFrame.MAPCHIP_SIZE, (map.edge.y + 5) * MainFrame.MAPCHIP_SIZE, this);
-      else g.drawImage(fr.duel, (map.edge.x + 7) * MainFrame.MAPCHIP_SIZE, (map.edge.y + 5) * MainFrame.MAPCHIP_SIZE, this);
+      if (fr.floor < 5) bg.drawImage(fr.world, (map.edge.x + 7) * MainFrame.MAPCHIP_SIZE, (map.edge.y + 5) * MainFrame.MAPCHIP_SIZE, this);
+      else bg.drawImage(fr.duel, (map.edge.x + 7) * MainFrame.MAPCHIP_SIZE, (map.edge.y + 5) * MainFrame.MAPCHIP_SIZE, this);
 
       // オブジェクトの配置
       for (int i = map.frameEdge.y; i < map.h; i++) {
         for (int j = map.frameEdge.x; j < map.w; j++) {
           if (map.object[i][j] != -1) {
-            g.drawImage(fr.itemChip[map.object[i][j]], 4 + (map.edge.x + j) * MainFrame.MAPCHIP_SIZE, (map.edge.y + i) * MainFrame.MAPCHIP_SIZE, this);
+            bg.drawImage(fr.itemChip[map.object[i][j]], 4 + (map.edge.x + j) * MainFrame.MAPCHIP_SIZE, (map.edge.y + i) * MainFrame.MAPCHIP_SIZE, this);
           }
         }
       }
       // ゴールの配置
       if (map.isInView(map.goal)) {
-        g.drawImage(fr.stair, 4 + (map.edge.x + map.goal.x) * MainFrame.MAPCHIP_SIZE, (map.edge.y + map.goal.y) * MainFrame.MAPCHIP_SIZE, this);
+        bg.drawImage(fr.stair, 4 + (map.edge.x + map.goal.x) * MainFrame.MAPCHIP_SIZE, (map.edge.y + map.goal.y) * MainFrame.MAPCHIP_SIZE, this);
       }
       if (fr.turn) {
         // 主人公を敵より前面に出す(主人公の行動)
@@ -73,7 +74,7 @@ public class FieldPanel extends JPanel implements KeyListener, Runnable {
           if (map.isInView(enemies.get(i).pos)) {
             // System.out.println("drawing: " + enemies.size());
             motion = (int)(1.1 - Math.sin(enemies.get(i).moved * Math.PI / 2));
-            g.drawImage(fr.slimeChip[fr.slimeType][enemies.get(i).dir.ordinal()][motion], 4 + (map.edge.x + enemies.get(i).pos.x) * MainFrame.MAPCHIP_SIZE, (map.edge.y + enemies.get(i).pos.y) * MainFrame.MAPCHIP_SIZE, this);
+            bg.drawImage(fr.slimeChip[fr.slimeType][enemies.get(i).dir.ordinal()][motion], 4 + (map.edge.x + enemies.get(i).pos.x) * MainFrame.MAPCHIP_SIZE, (map.edge.y + enemies.get(i).pos.y) * MainFrame.MAPCHIP_SIZE, this);
           }
         }
         // 主人公
@@ -81,10 +82,10 @@ public class FieldPanel extends JPanel implements KeyListener, Runnable {
         if (hero.hp > 0) {
           // アイテムの移動(主人公の下, 敵より上)
           if (thr) {
-            g.drawImage(fr.itemChip[hero.hand], 4 + thrCh * hero.dir.getX() + map.center.x * MainFrame.MAPCHIP_SIZE, thrCh * hero.dir.getY() + map.center.y * MainFrame.MAPCHIP_SIZE, this);
+            bg.drawImage(fr.itemChip[hero.hand], 4 + thrCh * hero.dir.getX() + map.center.x * MainFrame.MAPCHIP_SIZE, thrCh * hero.dir.getY() + map.center.y * MainFrame.MAPCHIP_SIZE, this);
           }
           // 回転および攻撃アニメーション
-          g.drawImage(fr.heroChip[(hero.dir.ordinal() + circ) % 4][motion], hero.attackX + 4 + map.center.x * MainFrame.MAPCHIP_SIZE, hero.attackY + map.center.y * MainFrame.MAPCHIP_SIZE, this);
+          bg.drawImage(fr.heroChip[(hero.dir.ordinal() + circ) % 4][motion], hero.attackX + 4 + map.center.x * MainFrame.MAPCHIP_SIZE, hero.attackY + map.center.y * MainFrame.MAPCHIP_SIZE, this);
         }
         // ダメージ表示
         if (enemies.size() != 0 && enemies.get(index).damaged) {
@@ -98,16 +99,16 @@ public class FieldPanel extends JPanel implements KeyListener, Runnable {
         // 敵を主人公より前面に出す(敵の行動)
         // 主人公
         motion = (int)(1.1 - Math.sin(hero.moved * Math.PI / 2));
-        if (hero.hp > 0) g.drawImage(fr.heroChip[hero.dir.ordinal()][motion], 4 + map.center.x * MainFrame.MAPCHIP_SIZE, map.center.y * MainFrame.MAPCHIP_SIZE, this);
+        if (hero.hp > 0) bg.drawImage(fr.heroChip[hero.dir.ordinal()][motion], 4 + map.center.x * MainFrame.MAPCHIP_SIZE, map.center.y * MainFrame.MAPCHIP_SIZE, this);
         // 敵
         for (int i = 0; i < enemies.size(); i++) {
           if (map.isInView(enemies.get(i).pos)) {
             motion = (int)(1.1 - Math.sin(enemies.get(i).moved * Math.PI / 2));
 
             if (i == index) {
-              g.drawImage(fr.slimeChip[fr.slimeType][enemies.get(i).dir.ordinal()][motion], enemies.get(i).attackX + 4 + (map.edge.x + enemies.get(i).pos.x) * MainFrame.MAPCHIP_SIZE, enemies.get(i).attackY + (map.edge.y + enemies.get(i).pos.y) * MainFrame.MAPCHIP_SIZE, this);
+              bg.drawImage(fr.slimeChip[fr.slimeType][enemies.get(i).dir.ordinal()][motion], enemies.get(i).attackX + 4 + (map.edge.x + enemies.get(i).pos.x) * MainFrame.MAPCHIP_SIZE, enemies.get(i).attackY + (map.edge.y + enemies.get(i).pos.y) * MainFrame.MAPCHIP_SIZE, this);
             } else {
-              g.drawImage(fr.slimeChip[fr.slimeType][enemies.get(i).dir.ordinal()][motion], 4 + (map.edge.x + enemies.get(i).pos.x) * MainFrame.MAPCHIP_SIZE, (map.edge.y + enemies.get(i).pos.y) * MainFrame.MAPCHIP_SIZE, this);
+              bg.drawImage(fr.slimeChip[fr.slimeType][enemies.get(i).dir.ordinal()][motion], 4 + (map.edge.x + enemies.get(i).pos.x) * MainFrame.MAPCHIP_SIZE, (map.edge.y + enemies.get(i).pos.y) * MainFrame.MAPCHIP_SIZE, this);
             }
           }
           
@@ -120,6 +121,7 @@ public class FieldPanel extends JPanel implements KeyListener, Runnable {
           g.drawString("-" + enemies.get(index).damageTo(hero), 10 + (map.edge.x + hero.pos.x) * MainFrame.MAPCHIP_SIZE, 4 + (map.edge.y + hero.pos.y) * MainFrame.MAPCHIP_SIZE);
         }
       }
+      g.drawImage(bufferedImage, 0, 0, this);
 
       Color white = new Color(200, 200, 200), alphaWhite = new Color(200, 200, 200, 150), alphaBlack = new Color(0, 0, 0, 150);
       Font font = new Font("Arial", Font.PLAIN, 15);
@@ -158,11 +160,6 @@ public class FieldPanel extends JPanel implements KeyListener, Runnable {
       g.fillRect(300, 23, 300, 7);
       g.setColor(Color.blue);
       g.fillRect(300, 23, (int)(300 * ((double)hero.fullness / hero.MAX_FULLNESS)), 7);
-      // fade-out
-      if (fade) {
-        g.setColor(new Color(0, 0, 0, val));
-        g.fillRect(0, 0, MainFrame.WIDTH, MainFrame.HEIGHT);
-      }
       if (hero.hp <= 0) fr.state = 4;
     } catch (Exception e) {
       e.printStackTrace();
@@ -512,7 +509,7 @@ public class FieldPanel extends JPanel implements KeyListener, Runnable {
     }
     if (hero.fullness <= 0) hero.hp -= 1;
     if (!fr.turn) enemyTurn();
-    if (!fade) repaint();
+    repaint();
   }
   @Override
   public void keyReleased(KeyEvent e) {

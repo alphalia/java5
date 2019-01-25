@@ -12,8 +12,8 @@ public class NewFloor {
     fr.map = new Map(94, 90);
     try {
       // マップの読み込み
-      if (fr.floor < 5) fr.br = new BufferedReader(new InputStreamReader(new FileInputStream(new File("map/map1.txt"))));
-      else fr.br = new BufferedReader(new InputStreamReader(new FileInputStream(new File("map/map2.txt"))));
+      if (fr.floor < 5) fr.br = new BufferedReader(new InputStreamReader(new FileInputStream(new File("../map/map1.txt"))));
+      else fr.br = new BufferedReader(new InputStreamReader(new FileInputStream(new File("../map/map2.txt"))));
       int k = 0; String str;
       while ((str = fr.br.readLine()) != null) {
         fr.map.status[k] = str.toCharArray();

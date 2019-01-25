@@ -18,9 +18,10 @@ public class Character {
   public int moved = 0;
   public int attackX = 0, attackY = 0, attack[] = {8, 8, 1, -1, -8, -8};
   public boolean attacked = false, skilled = false, damaged = false;
+  // public Map map;
   public Character(int id, String name, int level, int MAX_HP, int MAX_FULLNESS, int atk, int def, Point pos) {
     this.id = id; this.name = name; this.level = level; this.MAX_HP = MAX_HP; this.MAX_FULLNESS = MAX_FULLNESS;
-    this.hp = MAX_HP; this.fullness = MAX_FULLNESS; this.atk = atk; this.def = def; this.pos = pos;
+    this.hp = MAX_HP; this.fullness = MAX_FULLNESS; this.atk = atk; this.def = def; this.pos = pos; //this.map = map;
   }
   /**
    * 攻撃
